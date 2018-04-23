@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"  
+	xmlns:jee="http://www.springframework.org/schema/jee" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa-1.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+
+	
+
+	<!-- 
+	使用全类名的方式配置一个Bean
+	id		从容器获取一个Bean(对象)的依据 
+	class	这个Bean需要依据创建的包名和类名
+	-->
+    <bean id="p1" class="com.zr.spring.ioc.beans.Person">
+    	<!-- 
+    		给Bean的属性赋值,对应Bean里的set方法
+    		name		这个类里的某个属性
+    		value		具体的值
+    	 -->
+    	<property name="name" value="李小龙"/>
+    </bean>
+    <bean id="p2" class="com.zr.spring.ioc.beans.Person">
+    	<property name="name" value="李小龙"/>
+    </bean>
+    
+    <!-- 给构造方法注入内容 -->
+    <bean id="bmw" class="com.zr.spring.ioc.beans.Car">
+    	<!-- 
+    		index			指函造方法中参数的位置,第1个参数从0开始计算
+    		name			对应Bean中的属性
+    	 -->
+    	<constructor-arg index="0" value="宝马"/>
+    	<constructor-arg index="1" value="宝马公司"/>
+    	<constructor-arg index="2" value="500000"/>
+    </bean>
+    <bean id="benz" class="com.zr.spring.ioc.beans.Car">
+    	<constructor-arg name="name" value="奔驰"/>
+    	<constructor-arg name="producer" value="奔驰公司"/>
+    	<constructor-arg name="speed" value="120"/>
+    </bean>
+
+	<!-- 字面量注入,使用value或<value/>注入基本类型及包装类和字符串 -->
+	<bean id="jdbc" class="com.zr.spring.ioc.beans.JdbcResouce">
+		<!-- 
+			&, <, >都是一些特殊符号,需要进行转义
+			&		&amp;
+			<		&lt;
+			>		&gt;
+			或者可以使用<![CADATA[]]>形式进行原文输出
+		 -->
+		<!-- <property name="url" value="jdbc:mysql://localhost:3306/test?useUnicdoe=true&amp;characterEncoding=UTF8"/> -->
+		<property name="url">
+			<value><![CDATA[jdbc:mysql://localhost:3306/test?useUnicdoe=true&characterEncoding=UTF8]]></value>
+		</property>
+	</bean>
+	
+	
+	<!-- 注入其它Bean -->
+	 <bean id="p3" class="com.zr.spring.ioc.beans.Person">
+    	<property name="name" value="李小龙"/>
+    	<!-- 
+    		ref		引用容器中的其它Bean
+    	 -->
+    	<property name="car" ref="bmw"/>
+    </bean>
+    
+    <!-- 私有(匿名)Bean -->
+    <bean id="p4" class="com.zr.spring.ioc.beans.Person">
+    	<property name="name" value="李小龙"/>
+    	<property name="car">
+    		<bean class="com.zr.spring.ioc.beans.Car">
+		    	<constructor-arg name="name" value="奔驰"/>
+		    	<constructor-arg name="producer" value="奔驰公司"/>
+		    	<constructor-arg name="speed" value="220"/>
+    		</bean>
+    	</property>
+    </bean>  
+    
+    <!-- 集合的注入 -->
+    <bean id="cb" class="com.zr.spring.ioc.beans.CollectionBean">
+    	<!-- 
+    		<null />	把属性值设置为null
+    	 -->
+    	<property name="name"><null/></property>
+    	<!-- <property name="list">
+    		<list>
+    			<value>1</value>
+    			<value>2</value>
+    			<value>3</value>
+    		</list>
+    	</property> -->
+    	<property name="list" ref="list"></property>
+    	<property name="set">
+    		<set>
+    			<value>A</value>
+    			<value>B</value>
+    			<value>C</value>
+    		</set>
+    	</property>
+    	<property name="map">
+    		<map>
+    			<!-- 
+    				value		设置字面量值
+    				value-ref	引用其它Bean,例如我要一辆车
+    			 -->
+    			<entry key="语文" value="90"/>
+    			<entry key="数学" value="80"/>
+    		</map>
+    	</property>
+    	<property name="array">
+    		<array>
+    			<value>语文</value>
+    			<value>数学</value>
+    		</array>
+    	</property>
+    </bean>
+    <!-- 声明一个util bean -->
+    <util:list  id="list">
+    	<value>1</value>
+    	<value>2</value>
+    	<value>3</value>
+    </util:list>
+    
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+
